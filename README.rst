@@ -1,4 +1,3 @@
-===========
 healthy
 ===========
 
@@ -23,7 +22,7 @@ The package is given a score, based on this formula: ::
 Results are color coded, based on the score
 
 Usage
-=====
+-----
 
 The simplest command you can run is ::
 
@@ -43,7 +42,7 @@ There are 3 optional parameters ::
 
 
 Sample Output
-=============
+-------------
 
 ::
 
@@ -58,13 +57,13 @@ Sample Output
     Package not updated in 360 days
 
 Use Case
-========
+--------
 
 ``healthy`` can be used when you are trying to choose a package from a number of options. With ``healthy`` you can
 quickly gauge the risk and benefit of one package over the other and make your decision easier.
 
 Installation
-============
+------------
 ::
 
     pip install healthy
