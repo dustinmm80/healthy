@@ -1,0 +1,2 @@
+allow healthy to scan requirements files
+allow healthy to track the health of a package for a version range
