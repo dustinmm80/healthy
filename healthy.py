@@ -128,7 +128,8 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
         for reason in reasons:
             print(reason)
 
-    return score, reasons
+    if no_output:
+        return score, reasons
 
 
 def get_health_color(score):
