@@ -105,7 +105,7 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
 
     if package_info.get('author') in BAD_VALUES or package_info.get('author_email') in BAD_VALUES:
         score -= AUTHOR_MISSING
-        reasons.append('Author name and email missing')
+        reasons.append('Author name or email missing')
 
     if isinstance(package_uploaded_time, int) and package_uploaded_time < 0:
         score -= NO_RELEASE_FILES_PENALTY
