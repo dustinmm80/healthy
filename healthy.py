@@ -174,7 +174,7 @@ def main():
 
     parser.add_argument(
         '-n', '--no_output', required=False,
-        help='Show verbose output - the reasons for the package health score',
+        help='Show no output - no output will be generated',
         action='store_true'
     )
 
