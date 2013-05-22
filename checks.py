@@ -14,9 +14,9 @@ DAYS_STALE = 180  # number of days without update that a package is considered '
 HAS_LICENSE             = 20
 HAS_RELEASE_FILES       = 30
 NOT_STALE               = 15
-HAS_SUMMARY             = 10
+HAS_SUMMARY             = 15
 HAS_DESCRIPTION         = 30
-HAS_PYTHON_CLASSIFIERS  = 10
+HAS_PYTHON_CLASSIFIERS  = 15
 HAS_AUTHOR_INFO         = 10
 HAS_HOMEPAGE            = 10
 

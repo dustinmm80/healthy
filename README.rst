@@ -8,16 +8,15 @@ healthy checks the health of a Python package from its pypi listing
 
 The package is given a score, based on this formula: ::
 
-    Starting score                      = 100
-    No license                          - 20
-    No release files                    - 20
-    No download url/homepage            - 10
-    No updates in a year                - 15
-    No updates in 6 months              - 10 (not deducted if year penalty has already been applied)
-    No summary                          - 10
-    No description                      - 10
-    No author name or email             - 10
-    No Python compatibility classifiers - 10
+    Starting score                      = 0
+    Has license                         + 20
+    Has release files                   + 30
+    Has homepage                        + 10
+    Updated in last 6 months            + 15
+    Has summary                         + 15
+    Has description                     + 30
+    Has author name or email            + 10
+    Has Python classifiers              + 15
 
 Results are color coded, based on the score
 
@@ -50,11 +49,10 @@ Sample Output
 
     Django v1.2.1
     -----
-    score: 45
-    No License
-    Description is missing
+    score: 85/145 58%
+    Description missing
     Python classifiers missing
-    Package not updated in 360 days
+    Package not updated in 180 days
 
 Use Case
 --------

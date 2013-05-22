@@ -1,5 +1,5 @@
 # Requirements for the package
 blessings==1.5
-requests==1.2.0
-pylint==0.28.0
+#requests==1.2.0
+#pylint==0.28.0
 

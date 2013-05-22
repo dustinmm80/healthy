@@ -85,10 +85,10 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
         total_score = 0
 
     if not no_output:
-        score_string = 'score: {}/{} {}%'.format(
-            total_score, checks.TOTAL_POSSIBLE, int(float(total_score) / float(checks.TOTAL_POSSIBLE) * 100)
-        )
-        print(get_health_color(total_score)(score_string))
+        percentage = int(float(total_score) / float(checks.TOTAL_POSSIBLE) * 100)
+        score_string = 'score: {}/{} {}%'.format(total_score, checks.TOTAL_POSSIBLE, percentage)
+
+        print(get_health_color(percentage)(score_string))
 
     if verbose and not no_output:
         for reason in reasons:
