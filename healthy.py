@@ -4,13 +4,11 @@
 """
 healthy.py
 
-Checks the health of a Python package, based on this calculation:
-
-Health is on a scale from 0-100
+Checks the health of a Python package, based on it's Pypi information
 """
 import argparse
-from datetime import datetime, timedelta
 import os
+import checks
 
 try:
     # Different location in Python 3
@@ -32,22 +30,6 @@ TERMINAL = Terminal()
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 CLIENT = ServerProxy('http://pypi.python.org/pypi')
 
-DAYS_STALE = 180  # number of days without update that a package is considered 'stale'
-DAYS_VERY_STALE = 360  # number of days without update that a package is considered 'very stale'
-
-# Penalties
-LICENSE_PENALTY = 20
-NO_RELEASE_FILES_PENALTY = 20
-VERY_STALE_PENALTY = 15
-SUMMARY_PENALTY = 10
-DESCRIPTION_PENALTY = 10
-PYTHON_CLASSIFIERS_PENALTY = 10
-AUTHOR_MISSING = 10
-STALE_PENALTY = 10
-DOWNLOAD_URL_PENALTY = 10
-
-BAD_VALUES = ['UNKNOWN', '', None]
-
 
 def calculate_health(package_name, package_version=None, verbose=False, no_output=False):
     """
@@ -57,11 +39,12 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
     :param package_version: version number of package to check, optional - defaults to latest version
     :param verbose: flag to print out reasons
     :param no_output: print no output
+    :param lint: run pylint on the package
 
     :returns: (score: integer, reasons: list of reasons for score)
     :rtype: tuple
     """
-    score = 100
+    total_score = 0
     reasons = []
 
     package_releases = CLIENT.package_releases(package_name)
@@ -74,70 +57,58 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
         package_version = package_releases[0]
 
     package_info = CLIENT.release_data(package_name, package_version)
+    release_urls = CLIENT.release_urls(package_name, package_version)
 
     if not no_output:
         print(TERMINAL.bold('{} v{}'.format(package_name, package_version)))
         print('-----')
 
-    try:
-        package_uploaded_time = CLIENT.release_urls(package_name, package_version)[0]['upload_time']
-    except Exception as e:
-        package_uploaded_time = -1
+    checkers = [
+        checks.check_license,
+        checks.check_homepage,
+        checks.check_summary,
+        checks.check_description,
+        checks.check_python_classifiers,
+        checks.check_author_info,
+        checks.check_release_files,
+        checks.check_stale
+    ]
 
-    # package doesn't have a license
-    if package_info.get('license') in BAD_VALUES:
-        score -= LICENSE_PENALTY
-        reasons.append('No License')
+    for checker in checkers:
+        result, reason, score = checker(package_info, release_urls)
+        if result:
+            total_score += score
+        else:
+            reasons.append(reason)
 
-    # download_url or home_page missing
-    if package_info.get('download_url') in BAD_VALUES and package_info.get('home_page') in BAD_VALUES:
-        score -= DOWNLOAD_URL_PENALTY
-        reasons.append('Download url and home page missing')
-
-    # summary is missing
-    if package_info.get('summary') in BAD_VALUES:
-        score -= SUMMARY_PENALTY
-        reasons.append('Summary is missing')
-
-    # long description is missing
-    if package_info.get('description') in BAD_VALUES:
-        score -= DESCRIPTION_PENALTY
-        reasons.append('Description is missing')
-
-    # python classifiers missing
-    classifiers = package_info.get('classifiers')
-    if len([c for c in classifiers if c.startswith('Programming Language :: Python ::')]) == 0:
-        score -= PYTHON_CLASSIFIERS_PENALTY
-        reasons.append('Python classifiers missing')
-
-    if package_info.get('author') in BAD_VALUES or package_info.get('author_email') in BAD_VALUES:
-        score -= AUTHOR_MISSING
-        reasons.append('Author name or email missing')
-
-    if isinstance(package_uploaded_time, int) and package_uploaded_time < 0:
-        score -= NO_RELEASE_FILES_PENALTY
-        reasons.append('No release files have been uploaded')
-    else:
-        now = datetime.utcnow()
-
-        if now - timedelta(days=DAYS_VERY_STALE) > package_uploaded_time:
-            score -= VERY_STALE_PENALTY
-            reasons.append('Package not updated in {} days'.format(DAYS_VERY_STALE))
-        elif now - timedelta(days=DAYS_STALE) > package_uploaded_time:
-            score -= STALE_PENALTY
-            reasons.append('Package not updated in {} days'.format(DAYS_STALE))
+    if total_score < 0:
+        total_score = 0
 
     if not no_output:
-        score_string = 'score: {}'.format(score)
-        print(get_health_color(score)(score_string))
+        score_string = 'score: {}/{} {}%'.format(
+            total_score, checks.TOTAL_POSSIBLE, int(float(total_score) / float(checks.TOTAL_POSSIBLE) * 100)
+        )
+        print(get_health_color(total_score)(score_string))
 
     if verbose and not no_output:
         for reason in reasons:
             print(reason)
 
     if no_output:
-        return score, reasons
+        return total_score, reasons
 
+# def lint_package(download_url):
+#     """
+#     Run pylint on the packages files
+#     :param download_url: download url for the package
+#     :return: score of the package
+#     """
+#     sandbox = create_sandbox()
+#     package_dir = download_package_to_sandbox(sandbox, download_url)
+#     pylint_score = score(package_dir)
+#     destroy_sandbox(sandbox)
+#
+#     return pylint_score
 
 def get_health_color(score):
     """

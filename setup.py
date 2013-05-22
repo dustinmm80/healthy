@@ -52,7 +52,7 @@ settings.update(
     author='Dustin Collins',
     author_email='dustinrcollins@gmail.com',
     packages=['tests'],
-    scripts=['healthy.py'],
+    scripts=['healthy.py', 'checks.py'],
     url='https://github.com/dustinmm80/healthy',
     license='MIT',
     description='healthy checks the health of a Python package from its pypi listing',
