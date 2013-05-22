@@ -18,7 +18,14 @@ try:
 except ImportError:
     from xmlrpclib import ServerProxy
 
-from blessings import Terminal
+try:
+    from blessings import Terminal
+except:
+    class Terminal(object):
+        """A dummy Terminal class if we can't import Terminal."""
+        def passthrough(self, s):
+            return s
+        bold = red = green = yellow = orange = passthrough
 
 TERMINAL = Terminal()
 
