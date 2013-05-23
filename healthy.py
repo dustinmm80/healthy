@@ -59,6 +59,12 @@ def calculate_health(package_name, package_version=None, verbose=False, no_outpu
     package_info = CLIENT.release_data(package_name, package_version)
     release_urls = CLIENT.release_urls(package_name, package_version)
 
+    if not package_info or not release_urls:
+        if not no_output:
+            print(TERMINAL.red('Version {} is not listed on pypi'.format(
+                package_version)))
+        return 0, []
+
     if not no_output:
         print(TERMINAL.bold('{} v{}'.format(package_name, package_version)))
         print('-----')
